@@ -58,7 +58,7 @@ const googleCallback = async (req, res) => {
       }
     );
 
-    const { email, name, picture, id: googleId } = userRes.data;
+    const { email, name, id: googleId } = userRes.data;
 
     let user = await User.findOne({ email });
 
@@ -66,7 +66,6 @@ const googleCallback = async (req, res) => {
       user = await User.create({
         email,
         username: name,
-        picture,
         googleId,
         emailVerified: true,
       });
@@ -75,7 +74,7 @@ const googleCallback = async (req, res) => {
     req.session.user = {
       username: user.username,
       email: user.email,
-      picture: user.picture,
+      role: user.role,
     };
 
     req.session.save(() => {
@@ -215,7 +214,7 @@ const login = async (req, res) => {
     req.session.user = {
       username: user.username,
       email: user.email,
-      picture: user.picture,
+      role: user.role,
     };
 
     return res.status(200).json({ user: req.session.user });

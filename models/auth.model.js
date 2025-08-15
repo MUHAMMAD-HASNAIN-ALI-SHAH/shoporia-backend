@@ -10,11 +10,6 @@ const userSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    picture: {
-      type: String,
-      default:
-        "https://res.cloudinary.com/dpb0qryd0/image/upload/v1752848151/download_w9qcwl.png",
-    },
     emailVerified: {
       type: Boolean,
       default: false,
