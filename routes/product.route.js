@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
 require("dotenv").config();
-const { getAllProducts } = require("../controllers/product.controller");
+const {
+  getAllProducts,
+  getProductById,
+} = require("../controllers/product.controller");
 
 router.route("/").get(getAllProducts);
+router.route("/:productId").get(getProductById);
 
 module.exports = router;
