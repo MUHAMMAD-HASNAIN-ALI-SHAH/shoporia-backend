@@ -41,6 +41,7 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", require("./routes/auth.route"));
 app.use("/api/v2/admin", require("./routes/admin.route"));
 app.use("/api/v3/product", require("./routes/product.route"));
+app.use("/api/v4/cart", require("./routes/cart.route"));
 
 const port = process.env.PORT || 8080;
 
