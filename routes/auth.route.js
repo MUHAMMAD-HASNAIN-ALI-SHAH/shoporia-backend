@@ -30,6 +30,8 @@ router.route("/change-password").post(changePassword);
 
 router.route("/request-password-reset").post(requestPasswordReset);
 router.route("/check-password-reset-details").get(checkPasswordResetDetails);
-router.route("/forgot-password-change-password").post(forgotPasswordChangePassword);
+router
+  .route("/forgot-password-change-password")
+  .post(forgotPasswordChangePassword);
 
 module.exports = router;
