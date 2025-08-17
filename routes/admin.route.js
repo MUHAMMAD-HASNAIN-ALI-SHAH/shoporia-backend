@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 require("dotenv").config();
-const adminMiddleware = require("../middlewares/admin.middleware");
+const adminMiddleware = require("../middleware/admin.middleware");
 const {
   addProduct,
   editProduct,

@@ -5,9 +5,7 @@ const connectDb = require("./lib/db");
 const app = express();
 const cors = require("cors");
 const MongoStore = require("connect-mongo");
-
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+const { webHook } = require("./controllers/payment.controller");
 
 app.use(
   cors({
@@ -34,14 +32,25 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.send("Hello World!");
-});
+// Hello route
+app.get("/", (req, res) => res.send("Hello World!"));
 
+// --- WEBHOOK: exact path, raw body
+app.post(
+  "/api/v5/payment/webhook",
+  express.raw({ type: "application/json" }),
+  webHook
+);
+
+// --- Normal JSON for everything else
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
 app.use("/api/v1/auth", require("./routes/auth.route"));
 app.use("/api/v2/admin", require("./routes/admin.route"));
 app.use("/api/v3/product", require("./routes/product.route"));
 app.use("/api/v4/cart", require("./routes/cart.route"));
+app.use("/api/v5/payment", require("./routes/payment.route"));
+app.use("/api/v6/order", require("./routes/order.route"));
 
 const port = process.env.PORT || 8080;
 
