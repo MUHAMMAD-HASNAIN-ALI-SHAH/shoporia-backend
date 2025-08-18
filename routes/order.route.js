@@ -1,9 +1,14 @@
 const express = require("express");
-const { getMyOrders, getAllOrders, placedOrder } = require("../controllers/order.controller");
+const {
+  getMyOrders,
+  getAllOrders,
+  updateOrderStatus,
+} = require("../controllers/order.controller");
+const adminMiddleware = require("../middleware/admin.middleware");
 const router = express.Router();
 
-router.route("/get-my-orders").get(getMyOrders)
-router.route("/get-all-orders").get(getAllOrders);
-router.route("/place-order").get(placedOrder);
+router.route("/get-my-orders").get(getMyOrders);
+router.route("/get-all-orders").get(adminMiddleware, getAllOrders);
+router.route("/update-order-status").post(adminMiddleware, updateOrderStatus);
 
 module.exports = router;

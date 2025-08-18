@@ -53,7 +53,6 @@ const getMyOrders = async (req, res) => {
   }
 };
 
-
 // Get all completed orders (admin)
 const getAllOrders = async (req, res) => {
   try {
@@ -78,12 +77,25 @@ const getAllOrders = async (req, res) => {
   }
 };
 
-const placedOrder = async (req, res) => {
+const updateOrderStatus = async (req, res) => {
   try {
-    const { orderId } = req.body;
+    const { orderId, status } = req.body;
 
-    if (!orderId) {
-      return res.status(400).json({ message: "Order ID is required" });
+    if (!orderId || !status) {
+      return res
+        .status(400)
+        .json({ message: "Order ID and status are required" });
+    }
+
+    const validStatuses = [
+      "pending",
+      "placed",
+      "shipped",
+      "canceled",
+      "delivered",
+    ];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Invalid status" });
     }
 
     const order = await Order.findById(orderId);
@@ -91,14 +103,12 @@ const placedOrder = async (req, res) => {
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // Update order status to "placed"
-    order.status = "placed";
-
+    order.status = status;
     await order.save();
 
-    res.status(200).json({ message: "Order placed successfully", order });
+    res.status(200).json({ message: "Order status updated", order });
   } catch (error) {
-    console.error("Error placing order:", error);
+    console.error("Error updating order status:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -106,5 +116,5 @@ const placedOrder = async (req, res) => {
 module.exports = {
   getMyOrders,
   getAllOrders,
-  placedOrder,
+  updateOrderStatus
 };
