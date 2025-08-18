@@ -1,0 +1,1 @@
+const addRatting = async (req, res) => {}

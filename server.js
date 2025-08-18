@@ -51,6 +51,7 @@ app.use("/api/v3/product", require("./routes/product.route"));
 app.use("/api/v4/cart", require("./routes/cart.route"));
 app.use("/api/v5/payment", require("./routes/payment.route"));
 app.use("/api/v6/order", require("./routes/order.route"));
+app.use("/api/v7/address", require("./routes/address.route"));
 
 const port = process.env.PORT || 8080;
 
