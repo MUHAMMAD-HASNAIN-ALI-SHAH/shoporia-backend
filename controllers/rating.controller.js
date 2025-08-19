@@ -68,6 +68,31 @@ const addRating = async (req, res) => {
   }
 };
 
+const getProductRatings = async (req, res) => {
+  try {
+    const { productId } = req.params;
+    if (!productId) {
+      return res.status(400).json({ message: "Product ID is required" });
+    }
+
+    const ratings = await Rating.find({ product: productId })
+      .populate("user", "username email")
+      .sort({ createdAt: -1 });
+
+    if (ratings.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No ratings found for this product" });
+    }
+
+    res.status(200).json(ratings);
+  } catch (error) {
+    console.error("Error fetching ratings:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   addRating,
+  getProductRatings,
 };
