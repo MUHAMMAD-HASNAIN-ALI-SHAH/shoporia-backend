@@ -76,72 +76,114 @@ const createCheckOutSession = async (req, res) => {
 };
 
 // Stripe Webhook
+// const webHook = async (req, res) => {
+//   console.log("🔥 Webhook request received");
+
+//   // Debug: Log headers
+//   console.log("📩 Headers:", req.headers);
+
+//   // Debug: Check body type
+//   console.log("📦 Raw body type:", typeof req.body);
+
+//   const sig = req.headers["stripe-signature"];
+//   console.log("🔑 Stripe signature from headers:", sig);
+
+//   let event;
+
+//   try {
+//     console.log("⚡ Constructing Stripe event...");
+//     event = stripe.webhooks.constructEvent(
+//       req.body,
+//       sig,
+//       process.env.STRIPE_WEBHOOK_SECRET
+//     );
+//     console.log("✅ Stripe event constructed successfully:", event.type);
+//   } catch (err) {
+//     console.error("❌ Webhook signature verification failed:", err.message);
+//     return res.status(400).send(`Webhook Error: ${err.message}`);
+//   }
+
+//   // Debug log for full event
+//   console.log("📌 Full Event Object:", JSON.stringify(event, null, 2));
+
+//   if (event.type === "checkout.session.completed") {
+//     console.log("🎉 Event: checkout.session.completed triggered");
+
+//     const session = event.data.object;
+//     console.log("🛒 Checkout Session object:", session);
+
+//     const email = session.customer_email;
+//     console.log("📧 Extracted customer email:", email);
+
+//     try {
+//       console.log("🔍 Searching for pending cart with email:", email);
+//       const getCart = await Cart.findOne({ email, paymentStatus: "pending" });
+
+//       if (!getCart) {
+//         console.error("⚠️ No pending cart found for email:", email);
+//         return res.status(404).json({ message: "No pending cart found" });
+//       }
+
+//       console.log("🛒 Cart found:", getCart);
+
+//       // Update cart status
+//       console.log(
+//         `🔄 Updating cart ${getCart._id} paymentStatus to 'completed'`
+//       );
+//       getCart.paymentStatus = "completed";
+//       await getCart.save();
+
+//       console.log(`✅ Cart ${getCart._id} marked as completed`);
+//     } catch (err) {
+//       console.error("❌ Error processing webhook:", err);
+//     }
+//   } else {
+//     console.log(`ℹ️ Event type ${event.type} received, no action taken`);
+//   }
+
+//   console.log("📤 Sending response to Stripe...");
+//   res.json({ received: true });
+// };
+
 const webHook = async (req, res) => {
   console.log("🔥 Webhook request received");
 
-  // Debug: Log headers
-  console.log("📩 Headers:", req.headers);
-
-  // Debug: Check body type
-  console.log("📦 Raw body type:", typeof req.body);
-
   const sig = req.headers["stripe-signature"];
-  console.log("🔑 Stripe signature from headers:", sig);
-
   let event;
 
   try {
-    console.log("⚡ Constructing Stripe event...");
+    // req.body is a raw buffer because of express.raw()
     event = stripe.webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
-    console.log("✅ Stripe event constructed successfully:", event.type);
+    console.log("⚡ Stripe event constructed:", event.type);
   } catch (err) {
     console.error("❌ Webhook signature verification failed:", err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
-  // Debug log for full event
-  console.log("📌 Full Event Object:", JSON.stringify(event, null, 2));
-
   if (event.type === "checkout.session.completed") {
-    console.log("🎉 Event: checkout.session.completed triggered");
-
     const session = event.data.object;
-    console.log("🛒 Checkout Session object:", session);
-
-    const email = session.customer_email;
-    console.log("📧 Extracted customer email:", email);
+    console.log("💰 Checkout session completed for email:", session.customer_email);
 
     try {
-      console.log("🔍 Searching for pending cart with email:", email);
-      const getCart = await Cart.findOne({ email, paymentStatus: "pending" });
-
+      const getCart = await Cart.findOne({ email: session.customer_email, paymentStatus: "pending" });
       if (!getCart) {
-        console.error("⚠️ No pending cart found for email:", email);
+        console.error("No pending cart found for webhook");
         return res.status(404).json({ message: "No pending cart found" });
       }
 
-      console.log("🛒 Cart found:", getCart);
-
       // Update cart status
-      console.log(
-        `🔄 Updating cart ${getCart._id} paymentStatus to 'completed'`
-      );
       getCart.paymentStatus = "completed";
       await getCart.save();
-
       console.log(`✅ Cart ${getCart._id} marked as completed`);
     } catch (err) {
       console.error("❌ Error processing webhook:", err);
     }
-  } else {
-    console.log(`ℹ️ Event type ${event.type} received, no action taken`);
   }
 
-  console.log("📤 Sending response to Stripe...");
   res.json({ received: true });
 };
 

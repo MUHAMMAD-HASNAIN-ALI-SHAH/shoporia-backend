@@ -4,19 +4,23 @@ require("dotenv").config();
 const connectDb = require("./lib/db");
 const cors = require("cors");
 const MongoStore = require("connect-mongo");
-const bodyParser = require("body-parser");
 const { webHook } = require("./controllers/payment.controller");
 
 const app = express();
 
-// --- 1) Stripe webhook FIRST (raw body, no other middleware)
+// ----------------------------
+// 1) Stripe Webhook Route FIRST
+// ----------------------------
+// Must use raw body ONLY for webhook
 app.post(
   "/api/v5/payment/webhook",
-  bodyParser.raw({ type: "application/json" }),
+  express.raw({ type: "application/json" }), // preserves raw payload for Stripe signature
   webHook
 );
 
-// --- 2) Then apply other middleware
+// ----------------------------
+// 2) Other Middleware
+// ----------------------------
 app.use(
   cors({
     origin: process.env.FRONTEND_URL,
@@ -44,11 +48,13 @@ app.use(
   })
 );
 
-// --- 3) Normal body parsing AFTER webhook
+// Body parser for all other routes (after webhook)
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// --- 4) Routes
+// ----------------------------
+// 3) Routes
+// ----------------------------
 app.get("/", (req, res) => res.send("Hello World!"));
 
 app.use("/api/v1/auth", require("./routes/auth.route"));
@@ -60,10 +66,12 @@ app.use("/api/v6/order", require("./routes/order.route"));
 app.use("/api/v7/address", require("./routes/address.route"));
 app.use("/api/v8/rating", require("./routes/rating.route"));
 
+// ----------------------------
+// 4) Start Server
+// ----------------------------
 const port = process.env.PORT || 8080;
-
 connectDb().then(() => {
   app.listen(port, () => {
-    console.log(`🚀 Server is running on http://localhost:${port}`);
+    console.log(`🚀 Server running on http://localhost:${port}`);
   });
 });
