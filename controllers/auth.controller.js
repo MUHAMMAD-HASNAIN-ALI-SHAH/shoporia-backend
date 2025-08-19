@@ -77,9 +77,7 @@ const googleCallback = async (req, res) => {
       role: user.role,
     };
 
-    req.session.save(() => {
-      res.redirect(`${process.env.FRONTEND_URL}`);
-    });
+    res.redirect(`${process.env.FRONTEND_URL}`);
   } catch (err) {
     console.error("OAuth Error", err.response?.data || err.message);
     res.status(500).send("Authentication failed");
