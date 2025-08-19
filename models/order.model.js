@@ -18,6 +18,7 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "placed", "shipped", "delivered", "canceled"],
       default: "pending",
     },
+    rated: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

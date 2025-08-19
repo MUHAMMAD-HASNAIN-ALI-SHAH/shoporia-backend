@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const reviewSchema = new mongoose.Schema({
+const ratingSchema = new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Product",
@@ -12,6 +12,6 @@ const reviewSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-reviewSchema.index({ product: 1, user: 1 }, { unique: true });
+const Rating = mongoose.model("Rating", ratingSchema);
 
-module.exports = mongoose.model("Review", reviewSchema);
+module.exports = Rating;

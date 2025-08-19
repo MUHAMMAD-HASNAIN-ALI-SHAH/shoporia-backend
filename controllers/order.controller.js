@@ -39,10 +39,11 @@ const getMyOrders = async (req, res) => {
         .map((o) => ({
           _id: o._id.toString(),
           cartId: o.cartId.toString(),
-          product: o.product, // already populated with Product
+          product: o.product,
           quantity: o.quantity,
           createdAt: o.createdAt,
-          status: o.status, // "pending" | "placed" | "canceled"
+          status: o.status,
+          rated: o.rated,
         })),
     }));
 
@@ -116,5 +117,5 @@ const updateOrderStatus = async (req, res) => {
 module.exports = {
   getMyOrders,
   getAllOrders,
-  updateOrderStatus
+  updateOrderStatus,
 };
